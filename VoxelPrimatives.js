@@ -114,8 +114,8 @@ class VoxelCube {
             }
           }
           else if(this._fillMode === "outline") {
-            if((deltaX === 0 && deltaZ ===0) || (deltaX === this._width-1 && deltaZ === 0) || (deltaY === 0 && deltaZ ===0) || (deltaY === this._width-1 && deltaZ === 0) || (deltaX === 0 && deltaZ === this._height - 1) || (deltaX === this._width-1 && deltaZ === this._height - 1) ||(deltaY === 0 && deltaZ === this._height - 1) || (deltaY === this._breadth-1 && deltaZ === this._height - 1) || (deltaX === 0 && deltaY === 0) || (deltaX === 0 && deltaY === this._breadth - 1) || (deltaX === this._width-1 && deltaY === 0) || (deltaX === this._width-1 && deltaY === this._breadth - 1)) {
-              vox.setVoxel(this._x + deltaX, this._y + deltaY, this._z + deltaZ, 256-33);
+            if((deltaX === 0 && deltaZ ===0) || (deltaX === this._width-1 && deltaZ === 0) || (deltaY === 0 && deltaZ ===0) || (deltaY === this._breadth-1 && deltaZ === 0) || (deltaX === 0 && deltaZ === this._height - 1) || (deltaX === this._width-1 && deltaZ === this._height - 1) ||(deltaY === 0 && deltaZ === this._height - 1) || (deltaY === this._breadth-1 && deltaZ === this._height - 1) || (deltaX === 0 && deltaY === 0) || (deltaX === 0 && deltaY === this._breadth - 1) || (deltaX === this._width-1 && deltaY === 0) || (deltaX === this._width-1 && deltaY === this._breadth - 1)) {
+              vox.setVoxel(this._x + deltaX, this._y + deltaY, this._z + deltaZ, 32);
             }
           }
         }
@@ -137,7 +137,7 @@ class VoxelCube {
 }
 
 
-let cube1 = new VoxelCube(0,0,0,voxelDimensions.x,voxelDimensions.y,voxelDimensions.z, "white", "outline");
+let cube1 = new VoxelCube(0,0,0,5,1,4, "white", "hollow");
 console.log(cube1)
 cube1.buildCube();
 
