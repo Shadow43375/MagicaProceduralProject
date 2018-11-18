@@ -139,15 +139,34 @@ class VoxelCube {
 // add in primatives for pyramids and stairs
 
 class VoxelPyramid {
-  constructor(x = 0, y = 0, z = 0, width = 5, breadth = 5, height = 5, baseColor = 1) {
-    console.log(this._isPhysical(x + 1) && this._isPhysical(y + 1) && this._isPhysical(z + 1) && this._isPhysical(width)  && this._isPhysical(breadth) && this._isPhysical(height));
-    if(this._isPhysical(x + 1) && this._isPhysical(y + 1) && this._isPhysical(z + 1) && this._isPhysical(width)  && this._isPhysical(breadth) && this._isPhysical(height)) {
+  constructor(x = 0, y = 0, z = 0, width = 5, breadth = 5, baseColor = 1, pointy = false) {
+    if(this._isPhysical(x + 1) && this._isPhysical(y + 1) && this._isPhysical(z + 1) && this._isPhysical(width)  && this._isPhysical(breadth) && typeof pointy === 'boolean') {
       this._x = x;
       this._y = y; 
       this._z = z;
       this._width = width;
       this._breadth = breadth;
-      this._height = Math.floor((this.width + 1)/2);
+      this._extraHeight = undefined;
+      if(this.width === this.breadth) {
+        this.pointyMode = false;
+      }
+      else if(this.width !== this.breadth) {
+        this.pointyMode = pointy;
+      }
+      //need to modify height formula so as to work in the case of pointy mode. Should place WHOLE thing inside of a getter function so as to improve readability...
+        if(this._getLesserofTwo(this.width, this._breadth)) {
+          this._height = Math.floor((this._getLesserofTwo(this.width, this._breadth) + 1)/2);
+        }
+        else {
+          this._height = Math.floor((this.width + 1)/2);
+        }
+
+        if(this.pointyMode) {
+          // extra height for the points...
+          this._extraHeight = (this._getGreaterOfTwo(this._width, this._breadth) - 2*(this.height-1))/2 - 1
+          this.height = this.height + this._extraHeight;
+        }
+
       this._baseColor = baseColor;
     }
     else {
@@ -175,6 +194,10 @@ class VoxelPyramid {
     return this._baseColor;
   }
 
+  get pointyMode() {
+    return this._pointy;
+  }
+
   set width(newWidth) {
     this._width = newWidth;
   }
@@ -191,6 +214,10 @@ class VoxelPyramid {
     this._baseColor = newColor;
   }
 
+  set pointyMode(newPointyMode) {
+    this._pointy = newPointyMode
+  }
+
   _isPhysical(num) {
     if(num > 0 && num%1 === 0 && typeof num === 'number') {
       return true;
@@ -200,29 +227,85 @@ class VoxelPyramid {
     }
   }
 
+  _getGreaterOfTwo(a, b) {
+    if(a - b === 0) {
+      return false;
+    }
+    else if(a - b > 0) {
+      return a;
+    }
+    else if(a - b < 0) {
+      return b;
+    }
+  }
+
+  _getLesserofTwo(a,b) {
+    if(a - b === 0) {
+      return false;
+    }
+    else if(a - b > 0) {
+      return b;
+    }
+    else if(a - b < 0) {
+      return a;
+    }    
+  }
+
   buildPyramid() {
     let startingPoint = this.location;
+    let greaterDimension = this._getGreaterOfTwo(this.width, this.breadth);
     let currentWidth = this.width;
+    let currentBreadth = this.breadth;
+    let currentHeight = 0;
+    let heightOfBase = this.height;
+    if(typeof this._extraHeight !== "undefined") {
+      heightOfBase -= this._extraHeight;
+    }
 
-    for(let deltaZ = 0; deltaZ<this.height; deltaZ++) {
+    for(let deltaZ = 0; deltaZ<heightOfBase; deltaZ++) {
       for(let deltaX = 0; deltaX<currentWidth; deltaX++) {
-        for(let deltaY = 0; deltaY<currentWidth; deltaY++) {
+        for(let deltaY = 0; deltaY<currentBreadth; deltaY++) {
           vox.setVoxel(startingPoint[0] + deltaX, startingPoint[1] + deltaY, startingPoint[2] + deltaZ, this.baseColor);
         } 
       }      
       startingPoint[0] += 1;
       startingPoint[1] += 1;
       currentWidth -= 2;
-      // if(currentWidth !== 1) {
-      //   currentWidth -= 2;  
-      // }
+      currentBreadth -= 2;
+      currentHeight++;
+    }
+
+    if(this.pointyMode && greaterDimension) {
+      let remainingWidth = this._getGreaterOfTwo(currentWidth, currentBreadth);
+      if(this._getGreaterOfTwo(currentWidth, currentBreadth) === currentWidth){
+        while(remainingWidth > 0) {
+          for(let deltaX = 0; deltaX<remainingWidth; deltaX++) {
+            vox.setVoxel(startingPoint[0] + deltaX, startingPoint[1] - 1, currentHeight, this.baseColor);
+          }
+          startingPoint[0] += 1;
+          remainingWidth -= 2;
+          currentHeight++;
+        }
+      }
+      else if(this._getGreaterOfTwo(currentWidth, currentBreadth) === currentBreadth) {
+        while(remainingWidth > 0) {
+          for(let deltaY = 0; deltaY<remainingWidth; deltaY++) {
+            vox.setVoxel(startingPoint[0] - 1, startingPoint[1] + deltaY, currentHeight, this.baseColor);
+          }
+          startingPoint[1] += 1;
+          remainingWidth -= 2;
+          currentHeight++;
+        }
+      }
     }
   }
 
 }
 
 
-// let pyramid1 = new VoxelPyramid(0,0,0, 5,5);
-let pyramid1 = new VoxelPyramid(0,0,0, 64,64);
+let pyramid1 = new VoxelPyramid(15,15,0, 3, 8, 1, false);
+// let pyramid1 = new VoxelPyramid(15,15,0, 8, 3, 1, false);
 console.log(pyramid1);
 pyramid1.buildPyramid();
+
+// make sure to modify height function so that 1) it works when pointy mode is active and 2) so that it works when changing the dimensions of the pyramid when using the setter functions.
