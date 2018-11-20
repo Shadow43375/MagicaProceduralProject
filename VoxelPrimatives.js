@@ -76,7 +76,7 @@ class VoxelCube {
       this._y = newLocationArray[1];
       this._z = newLocationArray[2];
 
-      this.buildCube();
+      this.build();
     }
     else {
       return false;
@@ -99,7 +99,7 @@ class VoxelCube {
     }
   }
 
-  buildCube() {
+  build() {
     this.deconstructCube();
 
     for(let deltaX = 0; deltaX < this._width; deltaX++) {
@@ -136,16 +136,16 @@ class VoxelCube {
 
 }
 
-// add in primatives for pyramids and stairs
 
 class VoxelPyramid {
-  constructor(x = 0, y = 0, z = 0, width = 5, breadth = 5, baseColor = 1, pointy = false) {
-    if(this._isPhysical(x + 1) && this._isPhysical(y + 1) && this._isPhysical(z + 1) && this._isPhysical(width)  && this._isPhysical(breadth) && typeof pointy === 'boolean') {
+  constructor(x = 0, y = 0, z = 0, width = 5, breadth = 5, baseColor = 1, fillMode = "fill", pointy = false) {
+    if(this._isPhysical(x + 1) && this._isPhysical(y + 1) && this._isPhysical(z + 1) && this._isValidFillMode(fillMode) && this._isPhysical(width)  && this._isPhysical(breadth) && typeof pointy === 'boolean') {
       this._x = x;
       this._y = y; 
       this._z = z;
       this._width = width;
       this._breadth = breadth;
+      this._fillMode = fillMode;
       this._extraHeight = undefined;
       if(this.width === this.breadth) {
         this.pointyMode = false;
@@ -194,6 +194,10 @@ class VoxelPyramid {
     return this._baseColor;
   }
 
+  get fillMode() {
+    return this._fillMode;
+  }
+
   get pointyMode() {
     return this._pointy;
   }
@@ -218,12 +222,26 @@ class VoxelPyramid {
     this._pointy = newPointyMode
   }
 
+  set fillMode(newFilledState) {
+    if(this._isValidFillMode(newFilledState)) {
+      this._fillMode = newFilledState.toLowerCase();
+    }
+  }
+
   _isPhysical(num) {
     if(num > 0 && num%1 === 0 && typeof num === 'number') {
       return true;
     }
     else {
       return false;
+    }
+  }
+
+  _isValidFillMode(newFillMode) {
+    console.log("newFillMode = " + newFillMode);
+    newFillMode = newFillMode.toLowerCase();
+    if(typeof newFillMode === 'string' && (newFillMode === "fill" || newFillMode === "hollow")) {
+      return true;
     }
   }
 
@@ -251,7 +269,7 @@ class VoxelPyramid {
     }    
   }
 
-  buildPyramid() {
+  build() {
     let startingPoint = this.location;
     let greaterDimension = this._getGreaterOfTwo(this.width, this.breadth);
     let currentWidth = this.width;
@@ -265,7 +283,14 @@ class VoxelPyramid {
     for(let deltaZ = 0; deltaZ<heightOfBase; deltaZ++) {
       for(let deltaX = 0; deltaX<currentWidth; deltaX++) {
         for(let deltaY = 0; deltaY<currentBreadth; deltaY++) {
-          vox.setVoxel(startingPoint[0] + deltaX, startingPoint[1] + deltaY, startingPoint[2] + deltaZ, this.baseColor);
+          if(this.fillMode === "fill") {
+            vox.setVoxel(startingPoint[0] + deltaX, startingPoint[1] + deltaY, startingPoint[2] + deltaZ, this.baseColor);
+          }
+          else if(this.fillMode === "hollow") {
+            if((deltaZ === currentHeight && deltaY === 0) || (deltaZ === currentHeight && deltaX === 0) || (deltaZ === currentHeight && deltaY === currentBreadth - 1)  || (deltaZ === currentHeight && deltaX === currentWidth -1)) {
+              vox.setVoxel(startingPoint[0] + deltaX, startingPoint[1] + deltaY, startingPoint[2] + deltaZ, this.baseColor);
+            }
+          }
         } 
       }      
       startingPoint[0] += 1;
@@ -303,9 +328,9 @@ class VoxelPyramid {
 }
 
 
-let pyramid1 = new VoxelPyramid(15,15,0, 3, 8, 1, false);
-// let pyramid1 = new VoxelPyramid(15,15,0, 8, 3, 1, false);
+let pyramid1 = new VoxelPyramid(0,0,0, 64, 16, 1, "hollow", true);
 console.log(pyramid1);
-pyramid1.buildPyramid();
+pyramid1.build();
 
-// make sure to modify height function so that 1) it works when pointy mode is active and 2) so that it works when changing the dimensions of the pyramid when using the setter functions.
+// make pyramid work with hollow fill mode.
+// add in primatives for stairs
