@@ -1,22 +1,64 @@
 class Matrix {
-  constructor() {
+  constructor(width, height) {
     this._matrix = [];
-    for(let i = 0; i<arguments.length; i++) {
-      if(Array.isArray(arguments[i])) {
-        this._matrix.push(arguments[i]);
+    // checks if the matrix is being initalized using arrays of columns or if from width/height dimernsions.
+    let arrayInit = true;
+    for(let i = 0; i < arguments.length; i++) {
+      if(!Array.isArray(arguments[i])) {
+        arrayInit = false;
       }
+    }
+
+    // if the array is being intialized from an array it simply loads the values into the matrix. Otherwise it creates a width by height matrix with values initialzed to zero.
+    if(arrayInit) {
+      for(let i = 0; i<arguments.length; i++) {
+          this._matrix.push(arguments[i]);
+      }
+      this._width = this._matrix.length;
+      this._height = this._matrix[0].length;
+    }
+    else if(!arrayInit) {
+      for(let j = 0; j<height; j++) {
+        let matrixLine = [];
+        for(let i = 0; i<width; i++) {
+          matrixLine.push(0);
+        }
+        this._matrix.push(matrixLine);
+      }
+        this._width = width;
+        this._height = height;
     }
   }
 
-  static addMatrices(matrix1, matrix2) {
-    let newMatrix = new Matrix([0, 0], [0,0]);
+  get matrix() {
+    return this._matrix;
+  }
 
-    if(matrix1._matrix.length !== matrix2._matrix.length || matrix1._matrix[0].length !== matrix2._matrix[0].length) {
+  getValueAt(i, j) {
+    return this._matrix[i][j];
+  }
+
+  get width() {
+    return this._width;
+  }
+
+  get height() {
+    return this._height;
+  }
+
+  setValueAt(i, j, newValue) {
+    this._matrix[i][j] = newValue
+  }
+
+  static addMatrices(matrix1, matrix2) {
+    let newMatrix = new Matrix(2, 2);
+
+    if(matrix1.height !== matrix2.height || matrix1.width !== matrix2.width) {
       return false;
     }
     else {
-      let matrixWidth = matrix1._matrix.length;
-      let matrixHeight = matrix1._matrix[0].length;
+      let matrixWidth = matrix1.height;
+      let matrixHeight = matrix1.width;
       for(let j = 0; j < matrixHeight; j++) {
         for(let i = 0; i < matrixWidth; i++) {
           newMatrix._matrix[i][j] = matrix1._matrix[i][j] + matrix2._matrix[i][j];
@@ -27,10 +69,43 @@ class Matrix {
     }
   }
 
-  // a public method for displaying the matrix as an easy to read matrix string.
-  stringVersion(startPoint, endPoint) {
-    // return false if the cordinates are not arrays or if they are not the proper dimensions.
-    if(!Array.isArray(startPoint) || !Array.isArray(endPoint) || startPoint.length !== 2 || endPoint.length !== 2) {
+  static hadamardProduct(matrix1, matrix2) {
+    let newMatrix = new Matrix(2, 2);
+
+    if(matrix1.height !== matrix2.height || matrix1.width !== matrix2.width) {
+      return false;
+    }
+    else {
+      let matrixWidth = matrix1.height;
+      let matrixHeight = matrix1.width;
+      for(let j = 0; j < matrixHeight; j++) {
+        for(let i = 0; i < matrixWidth; i++) {
+          newMatrix._matrix[i][j] = matrix1._matrix[i][j] * matrix2._matrix[i][j];
+        }
+      }
+
+      return newMatrix
+    }    
+  }
+
+  static constantMultiplication(matrix, C) {
+    let newMatrix = new Matrix(2, 2);
+
+    let matrixWidth = matrix1.height;
+    let matrixHeight = matrix1.width;
+    for(let j = 0; j < matrixHeight; j++) {
+      for(let i = 0; i < matrixWidth; i++) {
+        newMatrix._matrix[i][j] = matrix1._matrix[i][j] * C;
+      }
+    }
+
+    return newMatrix
+  }
+
+  // a public method for displaying the matrix as an easy to read matrix string. 
+  stringVersion(startPoint = [0, 0], endPoint=[this.width - 1,this.height - 1]) {
+    // return false if the cordinates are not arrays or if they are not the proper dimensions OR if the first vector is not to the left/up of the second.
+    if(!Array.isArray(startPoint) || !Array.isArray(endPoint) || startPoint.length !== 2 || endPoint.length !== 2 || startPoint[0] < 0 || startPoint[0] > this.width || startPoint[1] < 0 || startPoint[1] > this.height || endPoint[0] < 0 || endPoint[0] > this.width || endPoint[1] < 0 || endPoint[1] > this.height || startPoint[0] > endPoint[0] || startPoint[1] > endPoint[1]) {
       return false
     }
     // proceed with the method if the above safety check is passed
@@ -116,13 +191,11 @@ class Matrix {
 
 }
 
-let matrix1 = new Matrix([1, 0], [0,1]);
-let matrix2 = new Matrix([0, 1], [0,1]);
-console.log(matrix1.stringVersion([0,0], [1,1]) + "\n + \n" + matrix2.stringVersion([0,0], [1,1]) + "\n = \n" + Matrix.addMatrices(matrix1, matrix2).stringVersion([0,0], [1,1]));
-// console.log(matrix1._matrix[0][0]);
+// let matrix1 = new Matrix([1, 0], [0,1]);
+let matrix = new Matrix(2,2);
+console.log(matrix.stringVersion());
+matrix.setValueAt(0,0, 15);
+console.log(matrix.stringVersion());
+console.log(matrix.getValueAt(0,0));
 
-// need to make defaults for .stringVersion so that it prints out the whole array rather than returning false.
-// nned to allow the creation of an array on the basis of dimensions instead of hard coded values.
-// need to add in safety features for getting sub array
-// add getter and setter functions for changing array values and adding and removing rows and columns
 // add matrix operators: matrix addition, matrix multiplication, hadamard multiplication, etc...
