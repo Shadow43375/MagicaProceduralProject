@@ -8,6 +8,25 @@ class Matrix {
     }
   }
 
+  static addMatrices(matrix1, matrix2) {
+    let newMatrix = new Matrix([0, 0], [0,0]);
+
+    if(matrix1._matrix.length !== matrix2._matrix.length || matrix1._matrix[0].length !== matrix2._matrix[0].length) {
+      return false;
+    }
+    else {
+      let matrixWidth = matrix1._matrix.length;
+      let matrixHeight = matrix1._matrix[0].length;
+      for(let j = 0; j < matrixHeight; j++) {
+        for(let i = 0; i < matrixWidth; i++) {
+          newMatrix._matrix[i][j] = matrix1._matrix[i][j] + matrix2._matrix[i][j];
+        }
+      }
+
+      return newMatrix
+    }
+  }
+
   // a public method for displaying the matrix as an easy to read matrix string.
   stringVersion(startPoint, endPoint) {
     // return false if the cordinates are not arrays or if they are not the proper dimensions.
@@ -97,10 +116,13 @@ class Matrix {
 
 }
 
-let matrix = new Matrix([111,0], [0,2], [11, 333220]);
-console.log(matrix.stringVersion([0,0], [2,1]));
-console.log(matrix.stringVersion([1, 0], [1,1]));
+let matrix1 = new Matrix([1, 0], [0,1]);
+let matrix2 = new Matrix([0, 1], [0,1]);
+console.log(matrix1.stringVersion([0,0], [1,1]) + "\n + \n" + matrix2.stringVersion([0,0], [1,1]) + "\n = \n" + Matrix.addMatrices(matrix1, matrix2).stringVersion([0,0], [1,1]));
+// console.log(matrix1._matrix[0][0]);
 
+// need to make defaults for .stringVersion so that it prints out the whole array rather than returning false.
+// nned to allow the creation of an array on the basis of dimensions instead of hard coded values.
 // need to add in safety features for getting sub array
 // add getter and setter functions for changing array values and adding and removing rows and columns
 // add matrix operators: matrix addition, matrix multiplication, hadamard multiplication, etc...
