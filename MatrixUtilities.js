@@ -50,6 +50,7 @@ class Matrix {
     this._matrix[i][j] = newValue
   }
 
+  // class method for adding matrices element wise
   static addMatrices(matrix1, matrix2)  {
     let matrixWidth = matrix1.width;
     let matrixHeight = matrix1.height;
@@ -69,6 +70,16 @@ class Matrix {
     }    
   }
 
+  static multiplyMatrices(matrix1, matrix2) {
+    
+    if(matrix1.width !== matrix2.height) {
+      return false;
+    }
+
+
+  }
+
+  // class method for find the matrix product element wise
   static hadamardProduct(matrix1, matrix2) {
     let matrixWidth = matrix1.width;
     let matrixHeight = matrix1.height;
@@ -88,6 +99,7 @@ class Matrix {
     }    
   }
 
+  // class method for multiplying a matrix by a constant
   static constantMultiplication(matrix, C) {
     let matrixWidth = matrix1.width;
     let matrixHeight = matrix1.height;
@@ -102,7 +114,7 @@ class Matrix {
     return newMatrix
   }
 
-
+  // class method returns new matrix which is the transpose of the input matrix.
   static transpose(matrix) {
     let matrixWidth = matrix.height;
     let matrixHeight = matrix.width;
@@ -117,6 +129,7 @@ class Matrix {
     return newMatrix
   }
 
+  // swaps the columns in the matrix
   swapColumns(columnA, columnB) {
     // checks to make sure that the columns specified in the argument actually exist. If NOT then returns false. Else if continues with the swap operation.
     if(columnA < 0 || columnB < 0 || columnA > this.width || columnB > this.width) {
@@ -142,6 +155,7 @@ class Matrix {
     }
   }
 
+  // swaps the rows in the matrix
   swapRows(rowA, rowB) {
     // checks to make sure that the rows specified in the argument actually exist. If NOT then returns false. Else if continues with the swap operation.
     if(rowA < 0 || rowB < 0 || rowA > this.height || rowB > this.height) {
@@ -233,13 +247,21 @@ class Matrix {
   // private method for finding the greatest element in a column. Used for figuring out how much space should be placed before each element in the matrix.
   _getGreatestInColumn(column) {
     let greatestYet = {
-      value: column[0],
+      identity: column[0],
+      value: column[0].toString().length,
       index: 0
     }
 
     for(let j = 0; j<column.length; j++) {
-      if(column[j] > greatestYet.value) {
-        greatestYet.value = column[j];
+      // console.log(column[j] + " length = " + column[j].toString().length);
+      // console.log("column[j].toString().length > greatestYet.value = ");
+      // console.log(column[j].toString().length > greatestYet.value);
+      if(column[j].toString().length > greatestYet.value) {
+        // console.log("column[j] = " + column[j]);
+        greatestYet.identity = column[j];
+        // console.log("greatestYet.identity = " + greatestYet.identity);
+        greatestYet.value = column[j].toString().length;
+        // console.log("greatestYet.value= " + greatestYet.value);
         greatestYet.index = j;
       }
     }
@@ -250,7 +272,7 @@ class Matrix {
 
   // a private method for finding out how much space should be placed before a number to ensure the uniform size of each matrix element for display purposes
   _getPaddingSpace(greatestNum, thisNum) {
-    let neededSpaces = greatestNum.toString().length - thisNum.toString().length;
+    let neededSpaces = greatestNum - thisNum.toString().length;
     let spaces= "";
 
     for(let i = 0; i<neededSpaces; i++) {
@@ -262,6 +284,8 @@ class Matrix {
 
 }
 
-let matrix1 = new Matrix([1, 3, 5], [2, 4, 6]);
+let matrix1 = new Matrix([3, -2],[1, 0], [2, 5]);
+console.log(matrix1.stringVersion());
+// console.log(Matrix.transpose(matrix1).stringVersion());
 
 // add matrix operators: matrix addition, matrix multiplication, hadamard multiplication, etc...
