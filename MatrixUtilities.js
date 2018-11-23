@@ -18,9 +18,9 @@ class Matrix {
       this._height = this._matrix[0].length;
     }
     else if(!arrayInit) {
-      for(let j = 0; j<height; j++) {
+      for(let i = 0; i<width; i++) {
         let matrixLine = [];
-        for(let i = 0; i<width; i++) {
+        for(let j = 0; j<height; j++) {
           matrixLine.push(0);
         }
         this._matrix.push(matrixLine);
@@ -50,36 +50,36 @@ class Matrix {
     this._matrix[i][j] = newValue
   }
 
-  static addMatrices(matrix1, matrix2) {
-    let newMatrix = new Matrix(2, 2);
+  static addMatrices(matrix1, matrix2)  {
+    let matrixWidth = matrix1.width;
+    let matrixHeight = matrix1.height;
+    var newMatrix = new Matrix(matrixWidth, matrixHeight);  
 
     if(matrix1.height !== matrix2.height || matrix1.width !== matrix2.width) {
       return false;
     }
     else {
-      let matrixWidth = matrix1.height;
-      let matrixHeight = matrix1.width;
       for(let j = 0; j < matrixHeight; j++) {
-        for(let i = 0; i < matrixWidth; i++) {
+        for(let i = 0; i < matrixWidth; i++) {    
           newMatrix._matrix[i][j] = matrix1._matrix[i][j] + matrix2._matrix[i][j];
         }
       }
 
       return newMatrix
-    }
+    }    
   }
 
   static hadamardProduct(matrix1, matrix2) {
-    let newMatrix = new Matrix(2, 2);
+    let matrixWidth = matrix1.width;
+    let matrixHeight = matrix1.height;
+    var newMatrix = new Matrix(matrixWidth, matrixHeight);  
 
     if(matrix1.height !== matrix2.height || matrix1.width !== matrix2.width) {
       return false;
     }
     else {
-      let matrixWidth = matrix1.height;
-      let matrixHeight = matrix1.width;
       for(let j = 0; j < matrixHeight; j++) {
-        for(let i = 0; i < matrixWidth; i++) {
+        for(let i = 0; i < matrixWidth; i++) {    
           newMatrix._matrix[i][j] = matrix1._matrix[i][j] * matrix2._matrix[i][j];
         }
       }
@@ -89,10 +89,10 @@ class Matrix {
   }
 
   static constantMultiplication(matrix, C) {
-    let newMatrix = new Matrix(2, 2);
+    let matrixWidth = matrix1.width;
+    let matrixHeight = matrix1.height;
+    let newMatrix = new Matrix(matrixWidth, matrixHeight);
 
-    let matrixWidth = matrix1.height;
-    let matrixHeight = matrix1.width;
     for(let j = 0; j < matrixHeight; j++) {
       for(let i = 0; i < matrixWidth; i++) {
         newMatrix._matrix[i][j] = matrix1._matrix[i][j] * C;
@@ -102,8 +102,77 @@ class Matrix {
     return newMatrix
   }
 
+
+  static transpose(matrix) {
+    let matrixWidth = matrix.height;
+    let matrixHeight = matrix.width;
+    let newMatrix = new Matrix(matrixWidth, matrixHeight);
+
+    for(let j = 0; j < matrixHeight; j++) {
+      for(let i = 0; i < matrixWidth; i++) {
+        newMatrix.matrix[i][j] = matrix._matrix[j][i];
+      }
+    }
+
+    return newMatrix
+  }
+
+  swapColumns(columnA, columnB) {
+    // checks to make sure that the columns specified in the argument actually exist. If NOT then returns false. Else if continues with the swap operation.
+    if(columnA < 0 || columnB < 0 || columnA > this.width || columnB > this.width) {
+      return false;
+    }
+    else {
+      // creates a copy of the columnA so that it is not overwritten during the swap.
+      let columnABuffer = []
+      for(let j = 0; j < this.height; j++) {
+        columnABuffer.push(this.matrix[columnA][j]);
+      }
+
+      // overwrites the values columnA with the values from columnB
+      for(let j = 0; j < this.height; j++) {
+        this.matrix[columnA][j] = this.matrix[columnB][j];
+      }
+      // overwrite the values from columnB with columnA
+      for(let j = 0; j < this.height; j++) {
+        this.matrix[columnB][j] = columnABuffer[j];
+      }
+
+      return true;
+    }
+  }
+
+  swapRows(rowA, rowB) {
+    // checks to make sure that the rows specified in the argument actually exist. If NOT then returns false. Else if continues with the swap operation.
+    if(rowA < 0 || rowB < 0 || rowA > this.height || rowB > this.height) {
+      return false;
+    }
+    else {
+      // creates a copy of the rowA so that it is not overwritten during the swap.
+      let rowABuffer = []
+      for(let i = 0; i < this.width; i++) {
+        rowABuffer.push(this.matrix[i][rowA])
+      }
+
+      // overwrites the values rowA with the values from columnB
+      for(let i = 0; i < this.width; i++) {
+        this.matrix[i][rowA] = this.matrix[i][rowB];
+      }
+     // overwrite the values from columnA with columnB
+      for(let i = 0; i < this.width; i++) {
+        this.matrix[i][rowB] = rowABuffer[i];
+      }
+
+      return true;
+    }
+  }
+
+
+
   // a public method for displaying the matrix as an easy to read matrix string. 
-  stringVersion(startPoint = [0, 0], endPoint=[this.width - 1,this.height - 1]) {
+  stringVersion(startPoint = [0, 0], endPoint=[this.width - 1, this.height - 1]) {
+
+
     // return false if the cordinates are not arrays or if they are not the proper dimensions OR if the first vector is not to the left/up of the second.
     if(!Array.isArray(startPoint) || !Array.isArray(endPoint) || startPoint.length !== 2 || endPoint.length !== 2 || startPoint[0] < 0 || startPoint[0] > this.width || startPoint[1] < 0 || startPoint[1] > this.height || endPoint[0] < 0 || endPoint[0] > this.width || endPoint[1] < 0 || endPoint[1] > this.height || startPoint[0] > endPoint[0] || startPoint[1] > endPoint[1]) {
       return false
@@ -115,6 +184,8 @@ class Matrix {
       //increment the end points by one to ensure that they function like .length for an array while allowing the user to use conventional 0 starting cordinates.
       endPoint[0]++;
       endPoint[1]++;
+      // console.log(startPoint);
+      // console.log(endPoint);
 
       // convert each element of the matrix into a string and fit into text with proper padding, parsing, and notation.
       for(let j = startPoint[1]; j<endPoint[1]; j++) {
@@ -191,11 +262,6 @@ class Matrix {
 
 }
 
-// let matrix1 = new Matrix([1, 0], [0,1]);
-let matrix = new Matrix(2,2);
-console.log(matrix.stringVersion());
-matrix.setValueAt(0,0, 15);
-console.log(matrix.stringVersion());
-console.log(matrix.getValueAt(0,0));
+let matrix1 = new Matrix([1, 3, 5], [2, 4, 6]);
 
 // add matrix operators: matrix addition, matrix multiplication, hadamard multiplication, etc...
