@@ -71,12 +71,29 @@ class Matrix {
   }
 
   static multiplyMatrices(matrix1, matrix2) {
-    
+    // let newMatrix = new Matrix(matrix1.height, matrix2.width);
+    // let newMatrix = new Matrix(matrix1.width, matrix2.height);
+    // let newMatrix = new Matrix(matrix2.height, matrix1.width);
+    let newMatrix = new Matrix(matrix2.width, matrix1.height);
+    // console.log("newMatrix.stringVersion() = ");
+    // console.log(newMatrix.stringVersion());
+
     if(matrix1.width !== matrix2.height) {
       return false;
     }
-
-
+    else {
+      for(let j = 0; j < newMatrix.height; j++) {
+        for(let i = 0; i < newMatrix.width; i++) {
+          let rowResult = 0;
+          for(let x = 0; x < matrix1.width; x++) {
+            // console.log("multiplying (" + x + ", " + j + ") of matrix1 (" + matrix1.matrix[x][j] + ") with (" + i + ", " + x + ") of matrix2 (" + matrix2.matrix[i][x] + ")");
+            rowResult = rowResult + (matrix1.matrix[x][j]*matrix2.matrix[i][x]);
+          }
+          newMatrix.matrix[i][j] = rowResult;
+        }
+      } 
+      return newMatrix;
+    }
   }
 
   // class method for find the matrix product element wise
@@ -198,8 +215,6 @@ class Matrix {
       //increment the end points by one to ensure that they function like .length for an array while allowing the user to use conventional 0 starting cordinates.
       endPoint[0]++;
       endPoint[1]++;
-      // console.log(startPoint);
-      // console.log(endPoint);
 
       // convert each element of the matrix into a string and fit into text with proper padding, parsing, and notation.
       for(let j = startPoint[1]; j<endPoint[1]; j++) {
@@ -253,15 +268,9 @@ class Matrix {
     }
 
     for(let j = 0; j<column.length; j++) {
-      // console.log(column[j] + " length = " + column[j].toString().length);
-      // console.log("column[j].toString().length > greatestYet.value = ");
-      // console.log(column[j].toString().length > greatestYet.value);
       if(column[j].toString().length > greatestYet.value) {
-        // console.log("column[j] = " + column[j]);
         greatestYet.identity = column[j];
-        // console.log("greatestYet.identity = " + greatestYet.identity);
         greatestYet.value = column[j].toString().length;
-        // console.log("greatestYet.value= " + greatestYet.value);
         greatestYet.index = j;
       }
     }
@@ -284,8 +293,15 @@ class Matrix {
 
 }
 
-let matrix1 = new Matrix([3, -2],[1, 0], [2, 5]);
-console.log(matrix1.stringVersion());
-// console.log(Matrix.transpose(matrix1).stringVersion());
+// let matrix1 = new Matrix([3, -2],[1, 0], [2, 5]);
+// let matrix2 = new Matrix([-1, 0, 2], [3, 5, 5]);
+// should rotate clockwise but is instead rotating counter clockwise.
+let vector = new Matrix([1, 0]);
+let transformationMatrix = new Matrix([0, -1], [1, 0]);
+console.log(transformationMatrix.stringVersion());
+console.log(); // indention between matrices.
+console.log(vector.stringVersion());
+console.log(); // indention between matrices.
+console.log(Matrix.multiplyMatrices(transformationMatrix, vector).stringVersion());
 
 // add matrix operators: matrix addition, matrix multiplication, hadamard multiplication, etc...
