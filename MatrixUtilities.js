@@ -3,16 +3,16 @@ class Matrix {
     this._matrix = [];
     // checks if the matrix is being initalized using arrays of columns or if from width/height dimernsions.
     let arrayInit = true;
-    for(let i = 0; i < arguments.length; i++) {
-      if(!Array.isArray(arguments[i])) {
+    for(let i = 0; i < arguments[0].length; i++) {
+      if(!Array.isArray(arguments[0][i])) {
         arrayInit = false;
       }
     }
 
     // if the array is being intialized from an array it simply loads the values into the matrix. Otherwise it creates a width by height matrix with values initialzed to zero.
     if(arrayInit) {
-      for(let i = 0; i<arguments.length; i++) {
-          this._matrix.push(arguments[i]);
+      for(let i = 0; i<arguments[0].length; i++) {
+          this._matrix.push(arguments[0][i]);
       }
       this._width = this._matrix.length;
       this._height = this._matrix[0].length;
@@ -71,12 +71,7 @@ class Matrix {
   }
 
   static multiplyMatrices(matrix1, matrix2) {
-    // let newMatrix = new Matrix(matrix1.height, matrix2.width);
-    // let newMatrix = new Matrix(matrix1.width, matrix2.height);
-    // let newMatrix = new Matrix(matrix2.height, matrix1.width);
     let newMatrix = new Matrix(matrix2.width, matrix1.height);
-    // console.log("newMatrix.stringVersion() = ");
-    // console.log(newMatrix.stringVersion());
 
     if(matrix1.width !== matrix2.height) {
       return false;
@@ -86,7 +81,6 @@ class Matrix {
         for(let i = 0; i < newMatrix.width; i++) {
           let rowResult = 0;
           for(let x = 0; x < matrix1.width; x++) {
-            // console.log("multiplying (" + x + ", " + j + ") of matrix1 (" + matrix1.matrix[x][j] + ") with (" + i + ", " + x + ") of matrix2 (" + matrix2.matrix[i][x] + ")");
             rowResult = rowResult + (matrix1.matrix[x][j]*matrix2.matrix[i][x]);
           }
           newMatrix.matrix[i][j] = rowResult;
@@ -146,6 +140,41 @@ class Matrix {
     return newMatrix
   }
 
+  static determinant(matrix) {
+    // check if matrix is square. If not return false.
+    if(matrix.width !== matrix.height) {
+      return false
+    }
+
+    //if matrix is square proceed with computation.
+    else {
+      if(matrix.width === 2) {
+        return matrix.matrix[0][0]*matrix.matrix[1][1] - matrix.matrix[1][0]*matrix.matrix[0][1];
+      }
+      else {
+        let determinant = 0;
+        let sign = 1;
+        let mask = {
+          columnToOmit: 0,
+          rowToOmit: 0
+        }
+        for(let i = 0; i < matrix.width; i++) {
+          if(sign % 2 === 1) {
+            determinant = determinant + matrix.matrix[i][0]*Matrix.determinant(this.getSubmatrixFromMask(matrix, mask));
+          }
+          else if(sign % 2 === 0) {
+            determinant = determinant - matrix.matrix[i][0]*Matrix.determinant(this.getSubmatrixFromMask(matrix, mask));
+          }
+          mask.columnToOmit = mask.columnToOmit + 1;
+          sign++;
+        }
+        
+        return determinant;
+      }
+    }
+
+  }
+
   // swaps the columns in the matrix
   swapColumns(columnA, columnB) {
     // checks to make sure that the columns specified in the argument actually exist. If NOT then returns false. Else if continues with the swap operation.
@@ -198,6 +227,46 @@ class Matrix {
     }
   }
 
+
+  static getSubmatrixFromMask(matrix, mask) {
+    let columnToOmit = mask.columnToOmit;
+    let rowToOmit = mask.rowToOmit;
+
+    // if(columnToOmit > matrix.width || rowToOmit > matrix.height || columnToOmit < 0 || rowToOmit < 0) {
+    //   return false
+    // }
+
+    if(typeof columnToOmit === 'undefined' && typeof rowToOmit === 'undefined') {
+      let newMatrix = new Matrix(matrix.width, matrix.height);
+      for(let j = 0; j < matrix.height; j++) {
+        for(let i = 0; i < matrix.width; i++) {
+          newMatrix.matrix[i][j] = matrix.matrix[i][j];
+        }
+      }
+      return newMatrix;     
+    }
+
+    else {
+      // console.log("columnToOmit = " + columnToOmit);
+      // console.log("rowToOmit = " + rowToOmit);
+      let newMatrix = [];
+      let newMatrixColumns = [];
+      for(let i = 0; i < matrix.width; i++) {
+        for(let j = 0; j < matrix.height; j++) {
+          if(j !== rowToOmit && i !== columnToOmit) {
+            newMatrixColumns.push(matrix.matrix[i][j]);
+          }
+        }
+        if(typeof newMatrixColumns[0] !== 'undefined') {
+          newMatrix.push(newMatrixColumns);
+        }
+        newMatrixColumns = [];
+      }
+
+      newMatrix = new Matrix(newMatrix);
+      return newMatrix;
+    }
+  }
 
 
   // a public method for displaying the matrix as an easy to read matrix string. 
@@ -293,15 +362,12 @@ class Matrix {
 
 }
 
-// let matrix1 = new Matrix([3, -2],[1, 0], [2, 5]);
-// let matrix2 = new Matrix([-1, 0, 2], [3, 5, 5]);
-// should rotate clockwise but is instead rotating counter clockwise.
-let vector = new Matrix([1, 0]);
-let transformationMatrix = new Matrix([0, -1], [1, 0]);
-console.log(transformationMatrix.stringVersion());
-console.log(); // indention between matrices.
-console.log(vector.stringVersion());
-console.log(); // indention between matrices.
-console.log(Matrix.multiplyMatrices(transformationMatrix, vector).stringVersion());
+// let matrix = new Matrix([[1, 2, 4], [2, -1, 0], [4, 3, 1]]);
+// let matrix = new Matrix([[-2,-1,2], [2,1,0], [-3,3,-1]]);
+let matrix = new Matrix([[1,1,2,-1], [2,2,7,4], [2,4,5,-6], [1,2,2,3]]);
+console.log(matrix.stringVersion());
+console.log();
+console.log(Matrix.determinant(matrix));
+// console.log(Matrix.getSubmatrixFromMask(matrix, mask).stringVersion());
 
 // add matrix operators: matrix addition, matrix multiplication, hadamard multiplication, etc...
