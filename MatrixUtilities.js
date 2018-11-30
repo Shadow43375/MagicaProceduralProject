@@ -1,3 +1,79 @@
+class Vector {
+  constructor() {
+    for(let i = 0; i < arguments.length; i++) {
+      if(typeof arguments[i] !== 'number') {
+        return false;
+      }
+    }
+    this._vector = [];
+    for(let i = 0; i < arguments.length; i++) {
+      this._vector.push(arguments[i]);
+    }
+  }
+
+  get vector() {
+    return this._vector
+  }
+
+  get stringVersion() {
+    let str = "";
+    for(let i = 0; i < this.vector.length; i++) {
+      // figure out the greatest number in the column so as to ensure that proper padding can make decimal places align.
+      let greatestInColumn = this._getGreatestInVector;
+      // apply padding (if any)
+      let paddingSpace = this._getPaddingSpace(greatestInColumn.value, this.vector[i]);
+          
+
+      str = str + "|" + paddingSpace + this.vector[i] + "|\n";
+    }
+
+    console.log(this._getGreatestInVector);
+    return str;
+  }
+
+    // private method for finding the greatest element in a column. Used for figuring out how much space should be placed before each element in the vector.
+    get _getGreatestInVector() {
+      let greatestYet = {
+        identity: this.vector[0],
+        value: this.vector[0].toString().length,
+        index: 0
+      }
+  
+      for(let j = 0; j<this.vector.length; j++) {
+        if(this.vector[j].toString().length > greatestYet.value) {
+          greatestYet.identity = this.vector[j];
+          greatestYet.value = this.vector[j].toString().length;
+          greatestYet.index = j;
+        }
+      }
+  
+      return greatestYet;
+    }
+
+      // a private method for finding out how much space should be placed before a number to ensure the uniform size of each matrix element for display purposes
+  _getPaddingSpace(greatestNum, thisNum) {
+    let neededSpaces = greatestNum - thisNum.toString().length;
+    let spaces= "";
+
+    for(let i = 0; i<neededSpaces; i++) {
+      spaces = spaces + " ";
+    }
+
+    return spaces;
+  }
+}
+
+
+let vector1 = new Vector(-101, 0.6767, 20);
+console.log(vector1);
+console.log(vector1.vector);
+console.log(vector1.stringVersion);
+
+
+
+
+
+
 class Matrix {
   constructor(width, height) {
     this._matrix = [];
@@ -362,12 +438,6 @@ class Matrix {
 
 }
 
-// let matrix = new Matrix([[1, 2, 4], [2, -1, 0], [4, 3, 1]]);
-// let matrix = new Matrix([[-2,-1,2], [2,1,0], [-3,3,-1]]);
-let matrix = new Matrix([[1,1,2,-1], [2,2,7,4], [2,4,5,-6], [1,2,2,3]]);
-console.log(matrix.stringVersion());
-console.log();
-console.log(Matrix.determinant(matrix));
-// console.log(Matrix.getSubmatrixFromMask(matrix, mask).stringVersion());
+
 
 // add matrix operators: matrix addition, matrix multiplication, hadamard multiplication, etc...
