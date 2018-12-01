@@ -1,13 +1,23 @@
 class Vector {
-  constructor() {
-    for(let i = 0; i < arguments.length; i++) {
-      if(typeof arguments[i] !== 'number') {
-        return false;
+  constructor(dimensions) {
+
+    if(!Array.isArray(dimensions) && typeof dimensions === 'number' ) {
+      this._vector = [];
+      for(let i = 0; i < dimensions; i++) {
+        this._vector.push(0);
       }
     }
-    this._vector = [];
-    for(let i = 0; i < arguments.length; i++) {
-      this._vector.push(arguments[i]);
+
+    else if(Array.isArray(dimensions)) {
+      for(let i = 0; i < dimensions.length; i++) {
+        if(typeof dimensions[i] !== 'number') {
+          return false;
+        }
+      }
+      this._vector = [];
+      for(let i = 0; i < dimensions.length; i++) {
+        this._vector.push(dimensions[i]);
+      }
     }
   }
 
@@ -17,6 +27,9 @@ class Vector {
 
   get stringVersion() {
     let str = "";
+    console.log("this.vector = ");
+    console.log(this.vector);
+    console.log("this.vector.length = " + this.vector.length);
     for(let i = 0; i < this.vector.length; i++) {
       // figure out the greatest number in the column so as to ensure that proper padding can make decimal places align.
       let greatestInColumn = this._getGreatestInVector;
@@ -27,7 +40,7 @@ class Vector {
       str = str + "|" + paddingSpace + this.vector[i] + "|\n";
     }
 
-    console.log(this._getGreatestInVector);
+    // console.log(this._getGreatestInVector);
     return str;
   }
 
@@ -61,13 +74,40 @@ class Vector {
 
     return spaces;
   }
+
+
+  static constantMultiplication(vector, C) {
+    let newVector = new Vector(vector.vector.length);
+
+    for(let i = 0; i < vector.vector.length; i++) {
+      newVector.vector[i] = vector.vector[i] * C;
+    }
+    console.log(newVector);
+    return newVector;
+  }
+
 }
 
 
-let vector1 = new Vector(-101, 0.6767, 20);
+let vector1 = new Vector([-1, 0, 2]);
+// let vector1 = new Vector(3);
 console.log(vector1);
-console.log(vector1.vector);
 console.log(vector1.stringVersion);
+let vector2 = Vector.constantMultiplication(vector1, 2);
+console.log(vector2.stringVersion);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -437,7 +477,5 @@ class Matrix {
   }
 
 }
-
-
 
 // add matrix operators: matrix addition, matrix multiplication, hadamard multiplication, etc...
