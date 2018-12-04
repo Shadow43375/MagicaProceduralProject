@@ -89,7 +89,7 @@ class Vector {
       return greatestYet;
     }
 
-      // a private method for finding out how much space should be placed before a number to ensure the uniform size of each matrix element for display purposes
+  // a private method for finding out how much space should be placed before a number to ensure the uniform size of each matrix element for display purposes
   _getPaddingSpace(greatestNum, thisNum) {
     let neededSpaces = greatestNum - thisNum.toString().length;
     let spaces= "";
@@ -99,6 +99,19 @@ class Vector {
     }
 
     return spaces;
+  }
+
+  static _toDegrees(angle) {
+    return angle * (180 / Math.PI);
+  }
+
+  static angleBetween(vector1, vector2, decimalPlaces = 3) {
+    
+
+    let result = 0;
+    result = this._toDegrees(Math.acos((this.dotProduct(vector1, vector2))/(vector1.magnitude(21)*vector2.magnitude(21)))).toPrecision(decimalPlaces);
+
+    return result;
   }
 
   static dotProduct(vector1, vector2) {
@@ -127,14 +140,9 @@ class Vector {
 }
 
 
-let vector1 = new Vector([11,27,5, 16]);
-console.log(vector1.magnitude(5));
-// let vector2 = new Vector([7,1]);
-// console.log(vector1.stringVersion);
-// console.log("*");
-// console.log(vector2.stringVersion);
-// console.log("=");
-// console.log(Vector.dotProduct(vector1, vector2));
+let vector1 = new Vector([1, 0]);
+let vector2 = new Vector([2, 0]);
+console.log(Vector.angleBetween(vector1, vector2));
 
 
 
