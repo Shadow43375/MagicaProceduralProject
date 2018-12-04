@@ -6,6 +6,7 @@ class Vector {
       for(let i = 0; i < dimensions; i++) {
         this._vector.push(0);
       }
+      this._dimensions = dimensions;
     }
 
     else if(Array.isArray(dimensions)) {
@@ -18,18 +19,43 @@ class Vector {
       for(let i = 0; i < dimensions.length; i++) {
         this._vector.push(dimensions[i]);
       }
+
+      this._dimensions = dimensions.length;
     }
+
+
   }
 
   get vector() {
     return this._vector
   }
 
+  get dimensions() {
+    return this._dimensions;
+  }
+
+  
+  magnitude(decimalPlaces = 3) {
+    if(decimalPlaces < 1 || decimalPlaces > 21) {
+      return false;
+    }
+    else if(decimalPlaces > 1 && decimalPlaces <= 21) {
+      let result = 0;
+      for(let i = 0; i < this.dimensions; i++) {
+        result = result + Math.pow(this.vector[i], 2);
+      }
+      // result = Math.pow(result, 1/this.dimensions);
+      result = Math.sqrt(result).toPrecision(decimalPlaces);
+  
+      return result;
+    }
+
+  }
+
+
   get stringVersion() {
     let str = "";
-    console.log("this.vector = ");
-    console.log(this.vector);
-    console.log("this.vector.length = " + this.vector.length);
+
     for(let i = 0; i < this.vector.length; i++) {
       // figure out the greatest number in the column so as to ensure that proper padding can make decimal places align.
       let greatestInColumn = this._getGreatestInVector;
@@ -75,6 +101,18 @@ class Vector {
     return spaces;
   }
 
+  static dotProduct(vector1, vector2) {
+    if(vector1.dimensions !== vector2.dimensions || typeof vector1 === 'undefined' || typeof vector2 === 'undefined') {
+      return false;
+    }
+    else if(vector1.dimensions === vector2.dimensions && typeof vector1 !== 'undefined' && typeof vector2 !== 'undefined') {
+      let result = 0;
+      for(let i = 0; i < vector1.dimensions; i++) {
+        result = result + vector1.vector[i] * vector2.vector[i];
+      }
+      return result;
+    }
+  }
 
   static constantMultiplication(vector, C) {
     let newVector = new Vector(vector.vector.length);
@@ -89,12 +127,16 @@ class Vector {
 }
 
 
-let vector1 = new Vector([-1, 0, 2]);
-// let vector1 = new Vector(3);
-console.log(vector1);
-console.log(vector1.stringVersion);
-let vector2 = Vector.constantMultiplication(vector1, 2);
-console.log(vector2.stringVersion);
+let vector1 = new Vector([11,27,5, 16]);
+console.log(vector1.magnitude(5));
+// let vector2 = new Vector([7,1]);
+// console.log(vector1.stringVersion);
+// console.log("*");
+// console.log(vector2.stringVersion);
+// console.log("=");
+// console.log(Vector.dotProduct(vector1, vector2));
+
+
 
 
 
