@@ -106,8 +106,6 @@ class Vector {
   }
 
   static angleBetween(vector1, vector2, decimalPlaces = 3) {
-    
-
     let result = 0;
     result = this._toDegrees(Math.acos((this.dotProduct(vector1, vector2))/(vector1.magnitude(21)*vector2.magnitude(21)))).toPrecision(decimalPlaces);
 
@@ -127,6 +125,21 @@ class Vector {
     }
   }
 
+  static crossProduct(vector1, vector2) {
+    let result = new Vector(3);
+
+    if(vector1.dimensions !== vector2.dimensions || typeof vector1 === 'undefined' || typeof vector2 === 'undefined' || vector1.dimensions !== 3 || vector2.dimensions !== 3) {
+      return false;
+    }
+    else  {
+      result.vector[0] = (vector1.vector[1]*vector2.vector[2] - vector1.vector[2]*vector2.vector[1]);
+      result.vector[1] = (vector1.vector[2]*vector2.vector[0] - vector1.vector[0]*vector2.vector[2]);
+      result.vector[2] = (vector1.vector[0]*vector2.vector[1] - vector1.vector[1]*vector2.vector[0]);
+    }
+
+    return result;
+  }
+
   static constantMultiplication(vector, C) {
     let newVector = new Vector(vector.vector.length);
 
@@ -140,9 +153,9 @@ class Vector {
 }
 
 
-let vector1 = new Vector([1, 0]);
-let vector2 = new Vector([2, 0]);
-console.log(Vector.angleBetween(vector1, vector2));
+let vector1 = new Vector([-1,7,4]);
+let vector2 = new Vector([-5,8,4]);
+console.log(Vector.crossProduct(vector1, vector2).stringVersion);
 
 
 
